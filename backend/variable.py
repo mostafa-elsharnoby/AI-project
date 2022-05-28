@@ -9,3 +9,9 @@ class Variable:
 
     def set_val(self, value):
         self.value = value
+
+    def is_assigned(self):
+        return self.value is not None
+
+    def __eq__(self, other):
+        return self.pos == other.pos

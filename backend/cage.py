@@ -4,7 +4,13 @@ class Cage:
         self.operation = operation
         self.value = value
 
+        if len(variables) == 1:
+            variables[0].value = value
+
     def is_valid(self):
+        if len(self.variables) == 1:
+            return True
+
         if self.operation == '+':
             summation = 0
             for var in self.variables:
