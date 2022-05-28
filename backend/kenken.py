@@ -5,18 +5,19 @@ class Kenken:
 
     def is_valid_row(self, var):
         row_values = [variable.value for variable in self.variables
-                      if variable.pos[0] == var.pos[0] and variable.value is not None]
+                      if variable.pos[0] == var.pos[0] and variable.is_assigned()]
         unq_row_values = set(row_values)
         return len(unq_row_values) == len(row_values)
 
     def is_valid_col(self, var):
         col_values = [variable.value for variable in self.variables
-                      if variable.pos[1] == var.pos[1] and variable.value is not None]
+                      if variable.pos[1] == var.pos[1] and variable.is_assigned()]
         unq_col_values = set(col_values)
         return len(unq_col_values) == len(col_values)
 
     def select_var(self):
-        return min([var for var in self.variables if var.value is None], key=lambda var: len(var.domain))
+        unassigned_vars = [var for var in self.variables if not var.is_assigned()]
+        return min(unassigned_vars, key=lambda var: len(var.domain))
 
     def find_cage(self, var):
         for cage in self.cages:
@@ -26,7 +27,7 @@ class Kenken:
         raise Exception("ERROR!!!!! Variable Not Found")
 
     def is_complete(self):
-        return all(var.value is not None for var in self.variables)
+        return all(var.is_assigned() for var in self.variables)
 
     def is_valid(self, var):
         var_cage = self.find_cage(var)
@@ -50,7 +51,7 @@ class Kenken:
 
     def solve(self):
         if self.backtrack():
-            return {var.pos: var.value for var in self.variables}
+            return [var.value for var in self.variables]
 
         else:
             "Can't Solve."

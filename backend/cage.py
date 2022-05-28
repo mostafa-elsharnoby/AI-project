@@ -14,7 +14,7 @@ class Cage:
         if self.operation == '+':
             summation = 0
             for var in self.variables:
-                if var.value is None:
+                if not var.is_assigned():
                     return True
                 summation += var.value
 
@@ -26,7 +26,7 @@ class Cage:
         elif self.operation == '*':
             multi = 1
             for var in self.variables:
-                if var.value is None:
+                if not var.is_assigned():
                     return True
                 multi *= var.value
 
@@ -36,7 +36,7 @@ class Cage:
                 return False
 
         elif self.operation == '-':
-            if self.variables[0].value is None or self.variables[1].value is None:
+            if not self.variables[0].is_assigned() or not self.variables[1].is_assigned():
                 return True
 
             if self.value == abs(self.variables[0].value - self.variables[1].value):
@@ -45,7 +45,7 @@ class Cage:
                 return False
 
         elif self.operation == '/':
-            if self.variables[0].value is None or self.variables[1].value is None:
+            if not self.variables[0].is_assigned() or not self.variables[1].is_assigned():
                 return True
             else:
                 if self.variables[0].value > self.variables[1].value:
