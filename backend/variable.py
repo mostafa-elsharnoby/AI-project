@@ -15,3 +15,6 @@ class Variable:
 
     def __eq__(self, other):
         return self.pos == other.pos
+
+    def __hash__(self):
+        return hash(self.pos)
