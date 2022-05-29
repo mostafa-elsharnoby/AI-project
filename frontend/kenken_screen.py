@@ -88,9 +88,138 @@ def generate_board(Row_Cols_Size):
         arr = grid_values[num-1]
         dict_[num-1]=1
     return grid_values
+#****************************************
+def show_numbers(values,Rows_Cols_Size):
+    for row in range(Rows_Cols_Size):
+        for column in range(Rows_Cols_Size):
+            start_x = (MARGIN + WIDTH) * column + MARGIN
+            start_y = (MARGIN + HEIGHT) * row + MARGIN
+            font_num = pygame.font.Font('freesansbold.ttf', 25)
+            txt = font_num.render(str(values[row][column]), True, black, white)
+            scr.blit(txt, (start_x + 25, start_y + 25))
 
+def make_cages(Row_Cols_Size,grid_values):
+    grid_cage = [[0 for i in range(Row_Cols_Size)] for j in range(Row_Cols_Size)]
+    sign_cage = [['' for i in range(Row_Cols_Size)] for j in range(Row_Cols_Size)]
+    num_cage = [[0 for i in range(Row_Cols_Size)] for j in range(Row_Cols_Size)]
+    signs = ['+','*','-','/']
+    shapes = [
+                [(1,1),(1,0)],
+                [(1, 0),(1,-1)],
+                [(1, 0)],
+                [(0, 1)],
+                [(-1, 0)],
+                [(0, -1)],
+                [(0,0)],
+                [(0, 1),(0,2),(1,1)],
+                [(1, 0),(2,0),(1,1)],
+                [(1, 0), (2, 0), (-1, -1)],
+                [(1, 0), (2, 0), (-1, -1),(1,1)],
+                [(1, 0), (2, 0), (1, -1), (1, 1)],
+                [(0,1),(0,2),(1,1),(1,2)]
+    ]
+    cnt = 0
+    for r in range(Row_Cols_Size):
+        for c in range(Row_Cols_Size):
+            if not grid_cage[r][c]:
+                count = 0
+                cnt = cnt + 1
+                flag = True
+                while flag:
+                    num = rand(len(shapes))
+                    num = num - 1
+                    if num == 6:
+                        up = (-1+r,0+c)
+                        down = (1+r, 0+c)
+                        left = (0+r, -1+c)
+                        right =(0+r, 1+c)
+                        if 0 <= up[0] < Row_Cols_Size and 0 <= up[1] < Row_Cols_Size:
+                            if not grid_cage[up[0]][up[1]]:
+                                continue
+                        if 0 <= down[0] < Row_Cols_Size and 0 <= down[1] < Row_Cols_Size:
+                            if not grid_cage[down[0]][down[1]]:
+                                continue
+                        if 0 <= left[0] < Row_Cols_Size and 0 <= left[1] < Row_Cols_Size:
+                            if not grid_cage[left[0]][left[1]]:
+                                continue
+                        if 0 <= right[0] < Row_Cols_Size and 0 <= right[1] < Row_Cols_Size:
+                            if not grid_cage[right[0]][right[1]]:
+                                continue
 
+                    flag_in = 1
+                    for tup in shapes[num]:
+                        r_ind = r + tup[0]
+                        c_ind = c + tup[1]
+                        if not (r_ind >= 0 and r_ind < Row_Cols_Size and c_ind >=0 and c_ind<Row_Cols_Size):
+                            flag_in = 0
+                        elif grid_cage[r_ind][c_ind]:
+                            flag_in=0
+                    if flag_in:
+                        flag = 0
+                        grid_cage[r][c] = cnt
+                        rand_sign_ind = 0
+                        if len(shapes[num]) == 1:
+                            rand_sign_ind = rand(len(signs)) - 1
+                        else:
+                            rand_sign_ind = rand(len(signs)-2) - 1
+                        sign = signs[rand_sign_ind]
+                        count += grid_values[r][c]
+                        for tup in shapes[num]:
+                            r_ind = r + tup[0]
+                            c_ind = c + tup[1]
+                            if sign is '+':
+                                count += grid_values[r_ind][c_ind]
+                            elif sign is '*':
+                                count *= grid_values[r_ind][c_ind]
+                            elif sign is '-':
+                                count -= grid_values[r_ind][c_ind]
+                                count = abs(count)
+                            elif sign is '/' and( count % grid_values[r_ind][c_ind] ==0 or grid_values[r_ind][c_ind] % count ==0):
+                                if count % grid_values[r_ind][c_ind] ==0:
+                                    count = count / grid_values[r_ind][c_ind]
+                                else:
+                                    count = grid_values[r_ind][c_ind] / count
+                                count = int(count)
+                            else:
+                                sign = '-'
+                                count -= grid_values[r_ind][c_ind]
+                                count = abs(count)
+                            grid_cage[r_ind][c_ind] = cnt
+                        num_cage[r][c] = count
+                        if not (shapes[num][0][0]==0 and shapes[num][0][1]==0):
+                            sign_cage[r][c] = sign
+                        else:
+                            num_cage[r][c]=grid_values[r][c]
 
+    return grid_cage,sign_cage,num_cage
+
+def draw_buttons_kenken(startX, startY, width, height, button_color):
+    index = 0
+    font = pygame.font.Font('freesansbold.ttf', 18)
+    btn1 = font.render('Solve', True, (255, 255, 255), button_color)
+    btn2 = font.render('Again', True, (255, 255, 255), button_color)
+    kenken_button_list = [
+        btn1,
+        btn2
+    ]
+    coordinates = []
+    j = 2
+    for i in range(2):
+        pygame.draw.rect(scr, button_color, [(j) * 200 + startX, (i) * (100 + height) + startY, width, height], border_radius=15)
+        coordinates.append(((j) * 200 + startX, (i) * (100 + height) + startY))
+        scr.blit(kenken_button_list[index], ((j) * 200 + startX + 18, (i) * (100 + height) + startY + 22))
+        index += 1
+    return coordinates
+
+def get_click_alg(coordinates):
+    mouse = pygame.mouse.get_pos()
+    button_num = None
+    for i in range(2):
+            if (coordinates[i][0] <= mouse[0] <= coordinates[i][0]+100) and (coordinates[i][1] <= mouse[1] <= coordinates[i][1]+66):
+                button_num = i+1
+                return i+1
+    return 0
+#****************************************
 pygame.init()
 window_size = [800, 600]
 scr = pygame.display.set_mode(window_size)
