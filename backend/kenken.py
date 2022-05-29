@@ -114,10 +114,14 @@ class Kenken:
         removed = False
 
         # self.curr_domains[Xi][:]:
+        new_dom = set()
         for value1 in var1.domain:
             if all(not self.check_constraints(var1, value1, var2, value2) for value2 in var2.domain):
-                self.remove(var1, value1)
                 removed = True
+            else:
+                new_dom.add(value1)
+
+        var1.domain = new_dom
 
         return removed
 
@@ -142,14 +146,8 @@ class Kenken:
 
         for value in var.domain:
             var.set_val(value)
-            new_domain = self.arc3(var)
 
-            minimum_domain_length = min([len(variable.domain) for variable in new_domain])
-            if minimum_domain_length == 0:
-                continue
-
-            if self.is_valid(var):
-                self.update_neighbors_domain(new_domain)
+            if self.arc3(var):
                 success = self.backtrack_forwardchecking()
                 if success:
                     return True

@@ -122,7 +122,7 @@ cages = [
 
 kenken = Kenken(variables, cages)
 t = time()
-solution2 = kenken.solve(solver=1)
+solution2 = kenken.solve(solver=2)
 print(time()-t)
 print(solution2 == solution1)
 print(solution2)
