@@ -2,13 +2,14 @@ from kenken import Kenken
 from cage import Cage
 from variable import Variable
 from time import time
+from ..frontend import game
 
-size = 5
+size = game.board_size
 variables = []
 for i in range(size):
     for j in range(size):
         variables.append(Variable((i, j), size))
-
+        
 cages = [
     Cage([
         variables[0],

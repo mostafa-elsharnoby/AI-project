@@ -1,10 +1,11 @@
 import pygame
 import math
 import time 
+from .. backend import *
+global board_size
+board_size = 5
 
-# initialize the game
 pygame.init()
-
 class Screen():
     def __init__(self, screen_width, screen_height, title, fill=(255,255,255)):
         self.screen_width = screen_width
