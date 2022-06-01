@@ -2,6 +2,8 @@ import pygame
 import random
 import GlobalVariables
 import scratch
+from cage import Cage
+from variable import Variable
 import ShowScreen1
 
 #import scratch
@@ -233,6 +235,48 @@ pygame.display.set_caption("Grid")
 done = False
 clock = pygame.time.Clock()
 font = pygame.font.Font('freesansbold.ttf', 15)
+
+def generate_board_generator(board_size):
+    size = board_size
+    grid = draw_grid(Rows_Cols_Size)
+    grid_values = generate_board(Rows_Cols_Size)
+    grid_cages, sign_cages, num_cages = make_cages(Rows_Cols_Size, grid_values)
+    variables_back = []
+    cages_back = []
+    num_of_cages = 0
+    for i in range(size):
+        for j in range(size):
+            num_of_cages = max(num_of_cages, grid_cages[i][j])
+            variables_back.append(Variable((i, j), size))
+    for i in range(1, num_of_cages + 1):
+        index_list = []
+        min_x_index = 10
+        min_y_index = 10
+        flag = 1
+        for r in range(size):
+            for c in range(size):
+                if grid_cages[r][c] == i:
+                    if flag:
+                        min_x_index = r
+                        min_y_index = c
+                        flag = 0
+                    index_list.append(variables_back[r * size + c])
+        print(
+            index_list,
+            sign_cages[min_x_index][min_y_index],
+            num_cages[min_x_index][min_y_index]
+        )
+        logic_sign = None
+        if len(index_list) > 1:
+            logic_sign = sign_cages[min_x_index][min_y_index]
+        cages_back.append(
+            Cage(
+                index_list,
+                logic_sign,
+                num_cages[min_x_index][min_y_index]
+            )
+        )
+    return cages_back, variables_back
 
 def show_kenken(done, board_size,algorithm_type):
     
