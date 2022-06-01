@@ -239,14 +239,14 @@ font = pygame.font.Font('freesansbold.ttf', 15)
 def generate_board_generator(board_size):
     size = board_size
     grid = draw_grid(Rows_Cols_Size)
-    grid_values = generate_board(Rows_Cols_Size)
-    grid_cages, sign_cages, num_cages = make_cages(Rows_Cols_Size, grid_values)
+    grid_values_back = generate_board(Rows_Cols_Size)
+    grid_cages_back, sign_cages_back, num_cages_back = make_cages(size, grid_values_back)
     variables_back = []
     cages_back = []
     num_of_cages = 0
     for i in range(size):
         for j in range(size):
-            num_of_cages = max(num_of_cages, grid_cages[i][j])
+            num_of_cages = max(num_of_cages, grid_cages_back[i][j])
             variables_back.append(Variable((i, j), size))
     for i in range(1, num_of_cages + 1):
         index_list = []
@@ -255,7 +255,7 @@ def generate_board_generator(board_size):
         flag = 1
         for r in range(size):
             for c in range(size):
-                if grid_cages[r][c] == i:
+                if grid_cages_back[r][c] == i:
                     if flag:
                         min_x_index = r
                         min_y_index = c
@@ -263,20 +263,22 @@ def generate_board_generator(board_size):
                     index_list.append(variables_back[r * size + c])
         print(
             index_list,
-            sign_cages[min_x_index][min_y_index],
-            num_cages[min_x_index][min_y_index]
+            sign_cages_back[min_x_index][min_y_index],
+            num_cages_back[min_x_index][min_y_index]
         )
         logic_sign = None
         if len(index_list) > 1:
-            logic_sign = sign_cages[min_x_index][min_y_index]
+            logic_sign = sign_cages_back[min_x_index][min_y_index]
         cages_back.append(
             Cage(
                 index_list,
                 logic_sign,
-                num_cages[min_x_index][min_y_index]
+                num_cages_back[min_x_index][min_y_index]
             )
         )
     return cages_back, variables_back
+
+# final_cages,final_var = generate_board_generator(5)
 
 def show_kenken(done, board_size,algorithm_type):
     
