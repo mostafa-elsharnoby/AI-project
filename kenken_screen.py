@@ -1,9 +1,13 @@
 import pygame
 import random
+import GlobalVariables
+import scratch
+from cage import Cage
+from variable import Variable
 
+#import scratch
 
-Rows_Cols_Size = 9
-
+Rows_Cols_Size = GlobalVariables.board_size
 
 # Buttons
 width = 100
@@ -220,41 +224,99 @@ def get_click_alg(coordinates):
                 return i+1
     return 0
 #****************************************
-pygame.init()
+
+
+# show_number = 0
+pygame.init()   
 window_size = [800, 600]
 scr = pygame.display.set_mode(window_size)
 pygame.display.set_caption("Grid")
 done = False
 clock = pygame.time.Clock()
-grid = draw_grid(Rows_Cols_Size)
-grid_values = generate_board(Rows_Cols_Size)
-grid_cages,sign_cages,num_cages = make_cages(Rows_Cols_Size,grid_values)
 font = pygame.font.Font('freesansbold.ttf', 15)
 
-show_number = 0
+def generate_board_generator(board_size):
+    size = board_size
+    grid = draw_grid(Rows_Cols_Size)
+    grid_values_back = generate_board(Rows_Cols_Size)
+    grid_cages_back, sign_cages_back, num_cages_back = make_cages(size, grid_values_back)
+    variables_back = []
+    cages_back = []
+    num_of_cages = 0
+    for i in range(size):
+        for j in range(size):
+            num_of_cages = max(num_of_cages, grid_cages_back[i][j])
+            variables_back.append(Variable((i, j), size))
+    for i in range(1, num_of_cages + 1):
+        index_list = []
+        min_x_index = 10
+        min_y_index = 10
+        flag = 1
+        for r in range(size):
+            for c in range(size):
+                if grid_cages_back[r][c] == i:
+                    if flag:
+                        min_x_index = r
+                        min_y_index = c
+                        flag = 0
+                    index_list.append(variables_back[r * size + c])
+        print(
+            index_list,
+            sign_cages_back[min_x_index][min_y_index],
+            num_cages_back[min_x_index][min_y_index]
+        )
+        logic_sign = None
+        if len(index_list) > 1:
+            logic_sign = sign_cages_back[min_x_index][min_y_index]
+        cages_back.append(
+            Cage(
+                index_list,
+                logic_sign,
+                num_cages_back[min_x_index][min_y_index]
+            )
+        )
+    return cages_back, variables_back
 
+# final_cages,final_var = generate_board_generator(5)
 
-while not done:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            done = True
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            button_num = get_click_alg(kenken_buttons_coordinates)
-            print("Button ", button_num, " is clicked")
-            if(button_num==1):
-                show_number = 1
+def show_kenken(done, board_size,algorithm_type):
+    
+    Rows_Cols_Size=board_size
+    grid = draw_grid(Rows_Cols_Size)
+    grid_values = generate_board(Rows_Cols_Size)
+    grid_cages,sign_cages,num_cages = make_cages(Rows_Cols_Size,grid_values)
+    
 
-        # elif event.type == pygame.MOUSEBUTTONDOWN:
-        #     pos = pygame.mouse.get_pos()
-        #     column = pos[0] // (WIDTH + MARGIN)
-        #     row = pos[1] // (HEIGHT + MARGIN)
-        #     grid[row][column] = 1
-    scr.fill((140,140,140))
-    kenken_buttons_coordinates = draw_buttons_kenken(startX, startY, width, height, button_color)
-    get_click_alg(kenken_buttons_coordinates)
-    draw_border(Rows_Cols_Size, grid, grid_cages, sign_cages, num_cages)
-    if(show_number):
-        show_numbers(grid_values,Rows_Cols_Size)
-    clock.tick(50)
-    pygame.display.flip()
-pygame.quit()
+    show_number = 0
+    while not done:
+        show_screen_1 = 0
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                button_num = get_click_alg(kenken_buttons_coordinates)
+                print("Button ", button_num, " is clicked")
+                if(button_num==1):
+                    soln = scratch.send_board(grid_cages, sign_cages, num_cages, algorithm_type)
+                    show_number = 1
+                elif button_num == 2:
+                    show_screen_1=1
+                    import game
+                    done = True
+                    game.show_first_screen(True)
+                    pygame.quit()
+                    break
+
+        if show_screen_1:
+            break
+        
+        scr.fill((140,140,140))
+        kenken_buttons_coordinates = draw_buttons_kenken(startX, startY, width, height, button_color)
+        get_click_alg(kenken_buttons_coordinates)
+        draw_border(Rows_Cols_Size, grid, grid_cages, sign_cages, num_cages)
+        if(show_number):
+            show_numbers(soln,Rows_Cols_Size)
+        clock.tick(50)
+        pygame.display.flip()   
+# pygame.quit()
+# import game

@@ -1,6 +1,5 @@
 import pygame
-import math
-import time 
+import time
 import kenken_screen
 import GlobalVariables
 #global board_size
@@ -328,15 +327,15 @@ def show_first_screen(running):
                 coordinates = draw_buttons_alg(screen2.screen, startX, startY + 100, width, height, button_color)
                 mos_x, mos_y = pygame.mouse.get_pos()
                 if button_num2 == 1:
-                    kenken_screen.show_kenken(False, GlobalVariables.board_size,1)
+                    kenken_screen.show_kenken(False, GlobalVariables.board_size, 1)
                     pygame.display.update()
                     screen2.endCurrent()
                 elif button_num2 == 2:
-                    kenken_screen.show_kenken(False, GlobalVariables.board_size,2)
+                    kenken_screen.show_kenken(False, GlobalVariables.board_size, 2)
                     pygame.display.update()
                     screen2.endCurrent()
                 elif button_num2 == 3:
-                    kenken_screen.show_kenken(False, GlobalVariables.board_size,3)
+                    kenken_screen.show_kenken(False, GlobalVariables.board_size, 3)
                     pygame.display.update()
                     screen2.endCurrent()
 
